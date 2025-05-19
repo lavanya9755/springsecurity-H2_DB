@@ -17,11 +17,12 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain defauSecurityFilterChain(HttpSecurity http) throws Exception{
         http.csrf(csrf -> csrf.disable()); //csrf disble
-        http.authorizeHttpRequests(auth -> auth // alllreq authenticates
-                .requestMatchers("/oauth2/**").permitAll()
-                .anyRequest().authenticated()
+        http.authorizeHttpRequests(authorizeHttpRequests -> 
+        authorizeHttpRequests.anyRequest().authenticated()
         );
-        http.formLogin(form -> form.defaultSuccessUrl("/hello",true)); 
+        http.oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/hello",true)); //git integeration
+        // http.formLogin(form -> form.defaultSuccessUrl("/hello",true)); //basic shit it was
+        
         return http.build();
 
     }
