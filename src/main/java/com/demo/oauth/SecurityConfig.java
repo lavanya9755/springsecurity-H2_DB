@@ -20,9 +20,9 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authorizeHttpRequests -> 
         authorizeHttpRequests.anyRequest().authenticated()
         );
-        http.oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/hello",true)); //git integeration
+        http.oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000/dashboard",true)); //git integeration
         // http.formLogin(form -> form.defaultSuccessUrl("/hello",true)); //basic shit it was
-        
+
         return http.build();
 
     }
