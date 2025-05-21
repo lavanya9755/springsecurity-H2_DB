@@ -31,14 +31,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
   private UserDetailsService userDetailsService;
 
   private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
-
+//
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) 
       throws ServletException, IOException {
     try {
       String jwt = parseJwt(request);
       if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-        String username = jwtUtils.getUsernameFromToken(jwt);
+        String username = jwtUtils.getUsernameFromToken(jwt); 
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         UsernamePasswordAuthenticationToken authentication =
@@ -52,6 +52,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
       }
     } catch (Exception e) {
+        //loggere is used to log the error
       logger.error("Cannot set user authentication: {}", e);
     }
 
