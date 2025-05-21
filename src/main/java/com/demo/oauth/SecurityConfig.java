@@ -1,5 +1,8 @@
 package com.demo.oauth;
 
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -9,7 +12,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
@@ -17,6 +23,10 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
+
+    //note: this is used to connect to database,H2
+    @Autowired
+    DataSource datasource;
 
     @Bean
     SecurityFilterChain defauSecurityFilterChain(HttpSecurity http) throws Exception{
@@ -38,20 +48,32 @@ public class SecurityConfig {
     //therfore inmemeoryuserdetailmanager is implementation os userdetailService
     @Bean
     public UserDetailsService userDetailsService(){
+
+       
         UserDetails user1 = User.withUsername("user1")
-                                .password("{noop}password1") //noop -prefix,used to save as plain text
+                                .password(passwordEncoder().encode("password1")) //noop -prefix,used to save as plain text
                                 .roles("USER")
                                 .build();
 
         UserDetails admin = User.withUsername("admin")
-                                .password("{noop}adminPass") 
+                                .password(passwordEncoder().encode("adminPass"))
                                 .roles("ADMIN")
                                 .build(); 
                                 
-        //create user in Database
-        // JdbcUserDetailsManager userdet
+        //create user in Database using jdbc ,takes Darasource as parameter in Constr
+        JdbcUserDetailsManager userdetailmanager = new JdbcUserDetailsManager(datasource);
+        userdetailmanager.createUser(user1);
+        userdetailmanager.createUser(admin);
 
-        return new InMemoryUserDetailsManager(user1,admin);
+        return userdetailmanager;
+
+
+        // return new InMemoryUserDetailsManager(user1,admin);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
     }
 
      
